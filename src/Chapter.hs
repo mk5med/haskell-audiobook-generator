@@ -1,6 +1,9 @@
-module Chapter (
-  isChapter, chapterOrEmpty, removeChapter
-) where
+module Chapter
+  ( isChapter,
+    chapterOrEmpty,
+    removeChapter,
+  )
+where
 
 import Text.Regex.TDFA
 

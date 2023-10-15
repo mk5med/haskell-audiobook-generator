@@ -1,14 +1,17 @@
 module Lib
   ( processBook,
-    substring,
+    extractSections,
     splitByLineCount,
+    ChapterProcessor,
   )
 where
 
 import Chapter (chapterOrEmpty, isChapter, removeChapter)
 
+type ChapterProcessor = [String] -> [[String]]
+
 -- Split a list of lines into sections separated by chapter
-extractSections :: [String] -> [[String]]
+extractSections :: ChapterProcessor
 extractSections [""] = [[""]]
 extractSections [] = [[""]]
 extractSections inStrs = do
@@ -36,7 +39,7 @@ substring i (cur : _rem) =
    in -- Combines thunks to create: ( cur1:(cur2:( ...:[] )), [] or remainer)
       (cur : y, ys)
 
-splitByLineCount :: Integer -> [String] -> [[String]]
+splitByLineCount :: Integer -> ChapterProcessor
 splitByLineCount _ [] = []
 splitByLineCount l inStrs =
   -- Get the substring
@@ -48,10 +51,10 @@ splitByLineCount l inStrs =
 addMarks :: [String] -> Integer -> [String]
 addMarks text indx = ["START OF CHAPTER " ++ show indx] ++ text ++ ["END OF CHAPTER " ++ show indx]
 
-processBook :: [String] -> [IO ()]
-processBook bookLines = do
+processBook :: p -> (p -> [[String]]) -> [([String], Integer)]
+processBook bookLines processor = do
   -- Extract the sections
-  let sections = extractSections bookLines
+  let sections = processor bookLines
 
   -- Index the sections
   let indexedSections = zip sections [0 ..]
@@ -62,10 +65,4 @@ processBook bookLines = do
           ( \(text, indx) -> (addMarks text indx, indx)
           )
           indexedSections
-
-  -- Return a list of actions to save the chapters to the file system
-  map
-    ( \(text, indx) -> do
-        writeFile ("chapter_" ++ show indx ++ ".txt") (unlines text)
-    )
-    indexedSectionsWithMarks
+  indexedSectionsWithMarks
