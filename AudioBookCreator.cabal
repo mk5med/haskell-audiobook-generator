@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       ArgParse
+      AudioConvert
       Chapter
       Lib
   other-modules:
@@ -35,7 +36,9 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+    , process
     , regex-tdfa
+    , zip
   default-language: Haskell2010
 
 executable AudioBookCreator-exe
@@ -48,7 +51,9 @@ executable AudioBookCreator-exe
   build-depends:
       AudioBookCreator
     , base >=4.7 && <5
+    , process
     , regex-tdfa
+    , zip
   default-language: Haskell2010
 
 test-suite AudioBookCreator-test
@@ -62,5 +67,7 @@ test-suite AudioBookCreator-test
   build-depends:
       AudioBookCreator
     , base >=4.7 && <5
+    , process
     , regex-tdfa
+    , zip
   default-language: Haskell2010

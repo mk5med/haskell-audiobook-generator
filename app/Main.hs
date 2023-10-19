@@ -1,6 +1,7 @@
 module Main (main) where
 
 import ArgParse (Flag (..), FlagEnum (..), cmdOptions, flagListIsValid, flagType)
+import AudioConvert (tts, ttsMacOS)
 import Lib (ChapterProcessor, extractSections, processBook, splitByLineCount)
 import System.Environment
 
@@ -40,13 +41,18 @@ process (Input inputFile) (Output outputDirectory) chapterProcessor = do
   -- This converts each group of lines into a single string and creates an IO action
   -- to save to the file system
   let processedBook = processBook file chapterProcessor
-   in mapM_
-        ( \(text, indx) ->
-            -- `unlines text` combines the list of strings into a single string with newline delimiters
-            writeFile (outputDirectory ++ "chapter_" ++ show indx ++ ".txt") (unlines text)
-        )
-        processedBook
-
+  mapM_
+    ( \(text, indx) ->
+        -- `unlines text` combines the list of strings into a single string with newline delimiters
+        writeFile (outputDirectory ++ "chapter_" ++ show indx ++ ".txt") (unlines text)
+    )
+    processedBook
+  mapM_
+    ( \(text, indx) -> do
+        putStrLn $ "Processing " ++ show indx
+        ttsMacOS (unlines text) (outputDirectory ++ "chapter_" ++ show indx)
+    )
+    processedBook
   putStrLn $ "Finished processing " ++ inputFile
 process _ _ _ = showError "REQ_ARGS"
 
@@ -63,5 +69,5 @@ headOrNothing l
 
 -- Helper to print standard error messages
 showError :: String -> IO ()
-showError "REQ_ARGS" = error "ERROR: Invalid arguments. Expected Input and Output"
+showError "REQ_ARGS" = error "ERROR: Invalid arguments. Expected Input (-i) and Output (-o) arguments"
 showError _ = error "Unknown error code"

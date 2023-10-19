@@ -19,7 +19,7 @@ readAsInt a = read a :: Integer
 
 splitCount :: Maybe String -> Flag
 -- Read as: (inputStrOrNull) => Split( readAsInt( fromMaybe(default=0, inputStrOrNull) ) )
-splitCount = Split . readAsInt . fromMaybe "1000"
+splitCount = Split . readAsInt . fromMaybe "500"
 
 options :: [OptDescr Flag]
 options =
